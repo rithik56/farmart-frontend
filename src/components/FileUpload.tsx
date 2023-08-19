@@ -58,7 +58,7 @@ const FileUpload = () => {
         formData.append("fileName", fileName);
 
         try {
-            const res = await axios.post("http://localhost:8000/upload", formData);
+            const res = await axios.post(`${process.env.REACT_APP_BASE_URL}/upload`, formData);
             const { data } = res
             setShortUrl(data.shortUrl)
             getFiles()
@@ -71,7 +71,7 @@ const FileUpload = () => {
 
     const getFiles = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/files")
+            const res = await axios.get(`${process.env.REACT_APP_BASE_URL}/files`)
             const { data } = res
             setFiles(data.files)
         } catch (err) {
@@ -82,8 +82,6 @@ const FileUpload = () => {
     useEffect(() => {
         getFiles()
     }, [])
-
-    console.log('<<<<<< files', files)
 
     return (
         <div className="App">
