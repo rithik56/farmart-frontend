@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/farmart-frontend/static/css/main.073c9b0a.css",
-    "main.js": "/farmart-frontend/static/js/main.ae9414b6.js",
+    "main.js": "/farmart-frontend/static/js/main.6c21db12.js",
     "static/js/787.07a9ceae.chunk.js": "/farmart-frontend/static/js/787.07a9ceae.chunk.js",
     "index.html": "/farmart-frontend/index.html",
     "main.073c9b0a.css.map": "/farmart-frontend/static/css/main.073c9b0a.css.map",
-    "main.ae9414b6.js.map": "/farmart-frontend/static/js/main.ae9414b6.js.map",
+    "main.6c21db12.js.map": "/farmart-frontend/static/js/main.6c21db12.js.map",
     "787.07a9ceae.chunk.js.map": "/farmart-frontend/static/js/787.07a9ceae.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.073c9b0a.css",
-    "static/js/main.ae9414b6.js"
+    "static/js/main.6c21db12.js"
   ]
 }
