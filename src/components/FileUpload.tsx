@@ -58,7 +58,7 @@ const FileUpload = () => {
         formData.append("fileName", fileName);
 
         try {
-            const res = await axios.post(`${process.env.REACT_APP_BASE_URL}/upload`, formData);
+            const res = await axios.post(`https://farmart-backend.onrender.com/upload`, formData);
             const { data } = res
             setShortUrl(data.shortUrl)
             getFiles()
@@ -81,7 +81,7 @@ const FileUpload = () => {
 
     const getFiles = async () => {
         try {
-            const res = await axios.get(`${process.env.REACT_APP_BASE_URL}/files`)
+            const res = await axios.get(`https://farmart-backend.onrender.com/files`)
             const { data } = res
             setFiles(data.files)
         } catch (err: any) {
