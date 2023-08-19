@@ -63,8 +63,18 @@ const FileUpload = () => {
             setShortUrl(data.shortUrl)
             getFiles()
         } catch (err: any) {
+            let content
+            if(err.response) {
+                content = err.response.data
+            }
+            else if(err.request) {
+                content = err.request
+            }
+            else {
+                content = err.message
+            }
             message.error({
-                content: <span>File with this name already exists! Choose a file with different name</span>
+                content: <span>{content}</span>
             })
         }
     };
@@ -74,8 +84,20 @@ const FileUpload = () => {
             const res = await axios.get(`${process.env.REACT_APP_BASE_URL}/files`)
             const { data } = res
             setFiles(data.files)
-        } catch (err) {
-            console.log(err)
+        } catch (err: any) {
+            let content
+            if(err.response) {
+                content = err.response.data
+            }
+            else if(err.request) {
+                content = err.request
+            }
+            else {
+                content = err.message
+            }
+            message.error({
+                content: <span>{content}</span>
+            })
         }
     }
 
