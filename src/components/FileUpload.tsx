@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Table, message } from 'antd';
+import { Table, message, Upload, Button } from 'antd';
+import { UploadOutlined } from '@ant-design/icons'
 import axios from 'axios';
+import type { UploadFile, RcFile } from 'antd/es/upload/interface';
 
 interface IFile {
     url: String,
@@ -14,61 +16,63 @@ const fileColumns = [
     {
         title: 'Url',
         dataIndex: 'url',
-    }, 
+    },
     {
         title: 'Name',
         dataIndex: 'name'
-    }, 
+    },
     {
         title: 'Type',
         dataIndex: 'mimetype'
-    }, 
+    },
     {
-        title: 'Encoding',
-        dataIndex: 'encoding'
+        title: 'Size (Kb)',
+        dataIndex: 'size'
     }
 ]
 
+const { Dragger } = Upload
+
 const FileUpload = () => {
 
-    const [file, setFile] = useState<File | undefined>();
+    const [isUploading, setIsUploading] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [fileName, setFileName] = useState<string>("");
     const [shortUrl, setShortUrl] = useState<string>("")
     const [files, setFiles] = useState<IFile[]>([])
 
-    const saveFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            setFile(e.target.files[0]);
-            setFileName(e.target.files[0].name);
-        }
-    };
+    const handleUpload = async () => {
 
-    const uploadFile = async (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        
-        if (!file) {
+        if (fileList.length === 0) {
             message.error({
                 content: <span>No File Selected</span>
             })
             return;
         }
 
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("fileName", fileName);
+        setIsUploading(true)
+
+        const formData = new FormData()
+        formData.append("file", fileList[0] as RcFile)
+        formData.append("fileName", fileName)
 
         try {
-            const res = await axios.post(`https://farmart-backend.onrender.com/upload`, formData);
-            const { data } = res
+            const response = await axios.post(`https://farmart-backend.onrender.com/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data', Accept: 'application/json' }, transformRequest: formData => formData })
+            const { data } = response
+            message.success({
+                content: 'file uploaded successfully'
+            })
             setShortUrl(data.shortUrl)
             getFiles()
         } catch (err: any) {
+            console.log(err)
             let content
-            if(err.response) {
+            if (err.response) {
                 content = err.response.data
             }
-            else if(err.request) {
-                content = err.request
+            else if (err.request) {
+                content = 'no response'
             }
             else {
                 content = err.message
@@ -77,19 +81,25 @@ const FileUpload = () => {
                 content: <span>{content}</span>
             })
         }
+
+        finally {
+            setIsUploading(false)
+            setFileList([])
+        }
     };
 
     const getFiles = async () => {
+        setIsLoading(true)
         try {
             const res = await axios.get(`https://farmart-backend.onrender.com/files`)
             const { data } = res
             setFiles(data.files)
         } catch (err: any) {
             let content
-            if(err.response) {
+            if (err.response) {
                 content = err.response.data
             }
-            else if(err.request) {
+            else if (err.request) {
                 content = err.request
             }
             else {
@@ -99,6 +109,7 @@ const FileUpload = () => {
                 content: <span>{content}</span>
             })
         }
+        setIsLoading(false)
     }
 
     useEffect(() => {
@@ -107,10 +118,35 @@ const FileUpload = () => {
 
     return (
         <div className="App">
-            <input type="file" onChange={saveFile} />
-            <button onClick={uploadFile}>Upload</button>
+            <Upload
+                beforeUpload={(file) => {
+                    setFileList([...fileList, file]);
+                    return false
+                }}
+                onRemove={(file: UploadFile<any>) => {
+                    const index = fileList.indexOf(file);
+                    const newFileList = fileList.slice();
+                    newFileList.splice(index, 1);
+                    setFileList(newFileList);
+                }}
+                fileList={fileList}
+            >
+                <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
+            <Button
+                type="primary"
+                onClick={handleUpload}
+                disabled={fileList.length === 0}
+                loading={isUploading}
+                style={{
+                    marginTop: 16,
+                }}
+            >
+                {isUploading ? 'Uploading' : 'Start Upload'}
+            </Button>
             <h1>Files</h1>
             <Table
+                loading={isLoading}
                 columns={fileColumns}
                 dataSource={files}
             />
